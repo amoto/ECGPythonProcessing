@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="newPrefix">
+    <file>hearthecg.jpg</file>
+    <file>ecg.png</file>
+  </qresource>
+</RCC>
