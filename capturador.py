@@ -1,5 +1,5 @@
 import serial
-
+import paho.mqtt.publish as publish
 class Capturador:
     
     def __init__(self,puerto,archivo):
@@ -13,9 +13,10 @@ class Capturador:
                 value = self.puerto.readline()
                 value = float(value.decode().strip())
                 if(len(self.lecturas) == 512):
+                    publish.single("paciente/1",str(self.lecturas),hostname="10.3.0.6")
                     print(self.lecturas)
                     f = open(self.archivo,'a')
-                    f.write(str(self.lecturas))
+                    f.write(str(self.lecturas)+'\n')
                     self.lecturas = []
                 else:
                     self.lecturas.append(value)
