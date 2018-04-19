@@ -6,7 +6,9 @@ setup(
     packages=[''],
     install_requires=[
         'pyserial',
-        'paho-mqtt'
+        'paho-mqtt',
+        'PyQt5',
+        'pyqtgraph'
     ],
     url='',
     license='',

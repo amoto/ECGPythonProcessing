@@ -11,10 +11,12 @@ from pyqtgraph.Qt import QtGui,QtCore
 import pyqtgraph as pg
 import numpy as np
 import serial
+import paho.mqtt.publish as publish
 from pyqtgraph.ptime import time
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
+        print('setup g')
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1021, 839)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -55,6 +57,7 @@ class Ui_MainWindow(object):
         self.pushButton.setText(_translate("MainWindow", "Iniciar"))
         
     def graficar(self):
+        print('holi')
         mensaje = QtWidgets.QMessageBox()
         if(len(self.lineEditPuerto.text()) == 0):
             mensaje.about(mensaje,'Error',"El puerto no puede quedar vacio")
@@ -65,10 +68,18 @@ class Ui_MainWindow(object):
          
     def update(self):
         global curva,data,puerto1
-        print("Entro al update")
         try:
             line = puerto1.readline().decode().strip()
             data.append(float(line))
+            self.lecturas.append(float(line))
+            if(len(self.lecturas)==512):
+                try:
+                    print(self.lecturas)
+                    publish.single("paciente/1", str(self.lecturas), hostname="10.3.0.6")
+                    self.lecturas = []
+                except Exception as e:
+                    print(e)
+                    self.lecturas = []
             xdata = np.array(data,dtype="float64")
             curva.setData(xdata)
             QtGui.QApplication.instance().processEvents()
@@ -77,26 +88,30 @@ class Ui_MainWindow(object):
         
     def iniciar(self):
         global curva,data,puerto1
-        curva = self.graphicsView.getPlotItem().plot()
+        print('iniciar')
         data = [0]
+        self.lecturas=[]
+        curva = self.graphicsView.getPlotItem().plot()
         puerto1 = serial.Serial(self.lineEditPuerto.text(),9600)
-        timer = QtCore.QTimer()
+        timer = QtCore.QTimer(self.graphicsView)
         timer.timeout.connect(self.update)
-        timer.start(1000)
+        timer.start(10)
         print("Antes")
-        QtGui.QApplication.instance().exec_()
+        QtGui.QApplication.instance().allWidgets()
         print("Despues")
         
             
 
 from pyqtgraph import PlotWidget
 
-if __name__ == "__main__":
+def main(MainWindow):
     import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
+    #app = QtWidgets.QApplication(sys.argv)
+    #MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    sys.exit(app.exec_())
+    #sys.exit(app.exec_())
+#if __name__ == "__main__":
+#    main()
 

@@ -7,10 +7,12 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from login.login import Login
+from ui_login.login.login import Login
+from graficador import Ui_MainWindow as grafic
 
 class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
+    def setupUi(self):
+        global MainWindow
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(435, 396)
         MainWindow.setStyleSheet("background-color: rgb(255, 255, 255);")
@@ -73,7 +75,7 @@ class Ui_MainWindow(object):
         self.img = QtWidgets.QFrame(self.centralwidget)
         self.img.setGeometry(QtCore.QRect(9, 239, 421, 111))
         self.img.setStyleSheet("background-color: rgb(255, 255, 255);\n"
-"image: url(hearthecg.jpg);")
+"image: url(ui_login/hearthecg.jpg);")
         self.img.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.img.setFrameShadow(QtWidgets.QFrame.Raised)
         self.img.setObjectName("img")
@@ -111,10 +113,15 @@ class Ui_MainWindow(object):
         self.loginButton.clicked.connect(self.loginClick)
         self.registerButton.clicked.connect(self.registerClick)
     def loginClick(self):
+        global MainWindow
         ans=self.logic.login(self.userNameEdit.text(),self.passwordEdit.text())
         about_box = QtWidgets.QMessageBox()
         if(ans[1]):
             about_box.about(about_box, 'Inicio de sesión exitoso', ans[0])
+            #MainWindow.close()
+            self.ui2=grafic()
+            self.ui2.setupUi(MainWindow)
+            MainWindow.show()
         else:
             about_box.about(about_box, 'Inicio de sesión fallido', ans[0])
     def registerClick(self):
@@ -124,13 +131,16 @@ class Ui_MainWindow(object):
             about_box.about(about_box, 'Registro exitoso', ans[0])
         else:
             about_box.about(about_box, 'Registro fallido', ans[0])
-
-if __name__ == "__main__":
+def main():
     import sys
+    global MainWindow
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
+    ui.setupUi()
     MainWindow.show()
     sys.exit(app.exec_())
 
+
+if __name__ == "__main__":
+    main()

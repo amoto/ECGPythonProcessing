@@ -1,5 +1,5 @@
 
-from login.persistence import Persistence
+from ui_login.login.persistence import Persistence
 class Login:
 
     def __init__(self):

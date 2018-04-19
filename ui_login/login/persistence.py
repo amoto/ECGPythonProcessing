@@ -1,6 +1,6 @@
 import hashlib
 import csv
-from login.error import Error
+from ui_login.login.error import Error
 class Persistence:
     def __init__(self):
         try:
