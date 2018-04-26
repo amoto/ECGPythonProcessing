@@ -1,0 +1,4 @@
+pyserial
+paho-mqtt
+PyQt5
+pyqtgraph
