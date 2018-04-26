@@ -16,7 +16,6 @@ from pyqtgraph.ptime import time
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        self.MainWindow = MainWindow
         print('setup g')
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1021, 839)
@@ -46,6 +45,7 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         
+        self.hilo1 = Hilo1(self.lineEditPuerto.text())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -89,9 +89,6 @@ class Ui_MainWindow(object):
         
     def iniciar(self):
         global curva,data
-        print("Antes de inicializar el hilo")
-        self.hilo1 = Hilo1(self.lineEditPuerto.text(),self.update,parent=self.MainWindow)
-        print("Despues de inicializar el hilo")
         print('iniciar')
         data = [0]
         self.lecturas=[]
@@ -111,12 +108,10 @@ class Hilo1(QtCore.QThread):
     sigf = QtCore.pyqtSignal(str)
     
     
-    def __init__(self,puerto,callback,parent=None):
+    def __init__(self,puerto,parent=None):
         super(Hilo1,self).__init__(parent)
-        print("Entró al constructor del hilo")
-        self.callback = callback
         self.puerto = serial.Serial(puerto,9600)
-        #self.sigf.connect(callback)
+        self.sigf.connect(ui.update)
 
         
     def run(self):
@@ -124,10 +119,7 @@ class Hilo1(QtCore.QThread):
             try:
                 valor = self.puerto.readline()
                 valor = valor.decode().strip()
-                print("Antes del callback")
-                self.callback(valor)
-                print("Despues del callback")
-                #self.sigf.emit(valor)
+                self.sigf.emit(valor)
             except Exception as e:
                 print(e)
         

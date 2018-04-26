@@ -1,0 +1,11 @@
+README.md
+capturador.py
+grafica.py
+graficador.py
+main.py
+setup.py
+ECGPythonProcessing.egg-info/PKG-INFO
+ECGPythonProcessing.egg-info/SOURCES.txt
+ECGPythonProcessing.egg-info/dependency_links.txt
+ECGPythonProcessing.egg-info/requires.txt
+ECGPythonProcessing.egg-info/top_level.txt
