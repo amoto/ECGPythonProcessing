@@ -16,6 +16,7 @@ from pyqtgraph.ptime import time
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
+        self.MainWindow = MainWindow
         print('setup g')
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1021, 839)
@@ -44,6 +45,7 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -66,12 +68,11 @@ class Ui_MainWindow(object):
             
             
          
-    def update(self):
-        global curva,data,puerto1
+    def update(self,valor):
+        global curva,data
         try:
-            line = puerto1.readline().decode().strip()
-            data.append(float(line))
-            self.lecturas.append(float(line))
+            data.append(float(valor))
+            self.lecturas.append(float(valor))
             if(len(self.lecturas)==512):
                 try:
                     print(self.lecturas)
@@ -87,18 +88,48 @@ class Ui_MainWindow(object):
             print(e)
         
     def iniciar(self):
-        global curva,data,puerto1
+        global curva,data
+        print("Antes de inicializar el hilo")
+        self.hilo1 = Hilo1(self.lineEditPuerto.text(),self.update,parent=self.MainWindow)
+        print("Despues de inicializar el hilo")
         print('iniciar')
         data = [0]
         self.lecturas=[]
         curva = self.graphicsView.getPlotItem().plot()
-        puerto1 = serial.Serial(self.lineEditPuerto.text(),9600)
+        self.hilo1.start()
         timer = QtCore.QTimer(self.graphicsView)
         timer.timeout.connect(self.update)
         timer.start(10)
         print("Antes")
         QtGui.QApplication.instance().allWidgets()
         print("Despues")
+        
+        
+        
+        
+class Hilo1(QtCore.QThread):
+    sigf = QtCore.pyqtSignal(str)
+    
+    
+    def __init__(self,puerto,callback,parent=None):
+        super(Hilo1,self).__init__(parent)
+        print("Entró al constructor del hilo")
+        self.callback = callback
+        self.puerto = serial.Serial(puerto,9600)
+        #self.sigf.connect(callback)
+
+        
+    def run(self):
+        while(True):
+            try:
+                valor = self.puerto.readline()
+                valor = valor.decode().strip()
+                print("Antes del callback")
+                self.callback(valor)
+                print("Despues del callback")
+                #self.sigf.emit(valor)
+            except Exception as e:
+                print(e)
         
             
 

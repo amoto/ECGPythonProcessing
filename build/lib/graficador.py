@@ -44,6 +44,8 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        
+        self.hilo1 = Hilo1(self.lineEditPuerto.text())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -66,12 +68,11 @@ class Ui_MainWindow(object):
             
             
          
-    def update(self):
-        global curva,data,puerto1
+    def update(self,valor):
+        global curva,data
         try:
-            line = puerto1.readline().decode().strip()
-            data.append(float(line))
-            self.lecturas.append(float(line))
+            data.append(float(valor))
+            self.lecturas.append(float(valor))
             if(len(self.lecturas)==512):
                 try:
                     print(self.lecturas)
@@ -87,18 +88,40 @@ class Ui_MainWindow(object):
             print(e)
         
     def iniciar(self):
-        global curva,data,puerto1
+        global curva,data
         print('iniciar')
         data = [0]
         self.lecturas=[]
         curva = self.graphicsView.getPlotItem().plot()
-        puerto1 = serial.Serial(self.lineEditPuerto.text(),9600)
+        self.hilo1.start()
         timer = QtCore.QTimer(self.graphicsView)
         timer.timeout.connect(self.update)
         timer.start(10)
         print("Antes")
         QtGui.QApplication.instance().allWidgets()
         print("Despues")
+        
+        
+        
+        
+class Hilo1(QtCore.QThread):
+    sigf = QtCore.pyqtSignal(str)
+    
+    
+    def __init__(self,puerto,parent=None):
+        super(Hilo1,self).__init__(parent)
+        self.puerto = serial.Serial(puerto,9600)
+        self.sigf.connect(ui.update)
+
+        
+    def run(self):
+        while(True):
+            try:
+                valor = self.puerto.readline()
+                valor = valor.decode().strip()
+                self.sigf.emit(valor)
+            except Exception as e:
+                print(e)
         
             
 
