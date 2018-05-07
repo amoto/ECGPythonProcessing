@@ -14,7 +14,7 @@ class Persistence:
         datos=csv.reader(f)
         user=None
         for line in datos:
-            if username==line[0]:
+            if line!='' and username==line[0]:
                 user=line
                 break
         f.close()

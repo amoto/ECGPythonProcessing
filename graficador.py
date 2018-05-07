@@ -70,20 +70,17 @@ class Ui_MainWindow(object):
          
     def update(self,valor):
         global curva,data
+        print("updateo: ",valor)
         try:
             data.append(float(valor))
-            self.lecturas.append(float(valor))
-            if(len(self.lecturas)==512):
-                try:
-                    print(self.lecturas)
-                    publish.single("paciente/1", str(self.lecturas), hostname="10.3.0.6")
-                    self.lecturas = []
-                except Exception as e:
-                    print(e)
-                    self.lecturas = []
+
             xdata = np.array(data,dtype="float64")
             curva.setData(xdata)
-            QtGui.QApplication.instance().processEvents()
+            #QtGui.QApplication.instance().processEvents()
+            if(len(data)>2048):
+                print("popeo")
+                data.pop(0)
+                #print(data)
         except Exception as e:
             print(e)
         
@@ -93,13 +90,13 @@ class Ui_MainWindow(object):
         self.hilo1 = Hilo1(self.lineEditPuerto.text(),self.update,parent=self.MainWindow)
         print("Despues de inicializar el hilo")
         print('iniciar')
-        data = [0]
+        data = [0 for i in range(2048)]
         self.lecturas=[]
         curva = self.graphicsView.getPlotItem().plot()
         self.hilo1.start()
-        timer = QtCore.QTimer(self.graphicsView)
+        '''timer = QtCore.QTimer(self.graphicsView)
         timer.timeout.connect(self.update)
-        timer.start(10)
+        timer.start(10)'''
         print("Antes")
         QtGui.QApplication.instance().allWidgets()
         print("Despues")
@@ -117,6 +114,7 @@ class Hilo1(QtCore.QThread):
         self.callback = callback
         self.puerto = serial.Serial(puerto,9600)
         #self.sigf.connect(callback)
+        self.lecturas=[]
 
         
     def run(self):
@@ -126,6 +124,15 @@ class Hilo1(QtCore.QThread):
                 valor = valor.decode().strip()
                 print("Antes del callback")
                 self.callback(valor)
+                self.lecturas.append(float(valor))
+                if (len(self.lecturas) == 512):
+                    try:
+                        print(self.lecturas)
+                        publish.single("paciente/1", str(self.lecturas), hostname="127.0.0.1")
+                        self.lecturas = []
+                    except Exception as e:
+                        print(e)
+                        self.lecturas = []
                 print("Despues del callback")
                 #self.sigf.emit(valor)
             except Exception as e:
