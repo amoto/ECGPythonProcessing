@@ -1,4 +1,4 @@
-from serverproc.cliente import Cliente
+from mqtt.cliente import Cliente
 from serverproc.procesamiento import Procesador
 import threading
 def main():

@@ -12,6 +12,8 @@ import pyqtgraph as pg
 import numpy as np
 import serial
 import paho.mqtt.publish as publish
+import threading
+from mqtt.cliente import Cliente
 from pyqtgraph.ptime import time
 
 class Ui_MainWindow(object):
@@ -23,13 +25,13 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(330, 20, 371, 51))
+        self.label.setGeometry(QtCore.QRect(330, 20, 411, 51))
         self.label.setObjectName("label")
         self.lineEditPuerto = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEditPuerto.setGeometry(QtCore.QRect(360, 180, 271, 31))
         self.lineEditPuerto.setObjectName("lineEditPuerto")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(380, 120, 241, 31))
+        self.label_2.setGeometry(QtCore.QRect(380, 120, 291, 31))
         self.label_2.setObjectName("label_2")
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(460, 250, 75, 23))
@@ -45,6 +47,39 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        self.hrlabel = QtWidgets.QLabel(self.centralwidget)
+        self.hrlabel.setGeometry(QtCore.QRect(795, 40, 91, 20))
+        self.hrlabel.setObjectName("hrlabel")
+        self.hrresult = QtWidgets.QLabel(self.centralwidget)
+        self.hrresult.setGeometry(QtCore.QRect(900, 40, 56, 17))
+        #self.hrresult.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        #                            "border-color: rgb(0, 0, 0);")
+        self.hrresult.setObjectName("hrresult")
+        self.pnn50result = QtWidgets.QLabel(self.centralwidget)
+        self.pnn50result.setGeometry(QtCore.QRect(900, 60, 56, 17))
+        #self.pnn50result.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        #                               "border-color: rgb(0, 0, 0);")
+        self.pnn50result.setObjectName("pnn50result")
+        self.pnn50label = QtWidgets.QLabel(self.centralwidget)
+        self.pnn50label.setGeometry(QtCore.QRect(795, 60, 91, 20))
+        self.pnn50label.setObjectName("pnn50label")
+        self.pnn20result = QtWidgets.QLabel(self.centralwidget)
+        self.pnn20result.setGeometry(QtCore.QRect(900, 80, 56, 17))
+        #self.pnn20result.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        #                              "border-color: rgb(0, 0, 0);")
+        self.pnn20result.setObjectName("pnn20result")
+        self.pnn20label = QtWidgets.QLabel(self.centralwidget)
+        self.pnn20label.setGeometry(QtCore.QRect(795, 80, 91, 20))
+        self.pnn20label.setObjectName("pnn20label")
+        self.rmssdresult = QtWidgets.QLabel(self.centralwidget)
+        self.rmssdresult.setGeometry(QtCore.QRect(900, 100, 56, 17))
+        #self.rmssdresult.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        #                              "border-color: rgb(0, 0, 0);")
+        self.rmssdresult.setObjectName("rmssdresult")
+        self.rmssdlabel = QtWidgets.QLabel(self.centralwidget)
+        self.rmssdlabel.setGeometry(QtCore.QRect(795, 100, 91, 20))
+        self.rmssdlabel.setObjectName("rmssdlabel")
+
         
 
         self.retranslateUi(MainWindow)
@@ -57,7 +92,36 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:18pt;\">Bienvenido a ECGPythonProcessing</span></p></body></html>"))
         self.label_2.setText(_translate("MainWindow", "Ingrese el puerto por donde se leeran los datos:"))
         self.pushButton.setText(_translate("MainWindow", "Iniciar"))
-        
+        self.hrlabel.setText(_translate("MainWindow", "Ritmo cardíaco"))
+        self.hrresult.setText(_translate("MainWindow", "0"))
+        self.pnn50result.setText(_translate("MainWindow", "0"))
+        self.pnn50label.setText(_translate("MainWindow", "pnn50"))
+        self.pnn20result.setText(_translate("MainWindow", "0"))
+        self.pnn20label.setText(_translate("MainWindow", "pnn20"))
+        self.rmssdresult.setText(_translate("MainWindow", "0"))
+        self.rmssdlabel.setText(_translate("MainWindow", "rmssd"))
+        self.chr = 0
+        self.cpnn50 = 0
+        self.cpnn20 = 0
+        self.crmssd = 0
+        t1=threading.Thread(target=self.subscribe,args=(self.chr,"paciente/1/hr",self.prochr,"hr"))
+        t2 = threading.Thread(target=self.subscribe, args=(self.cpnn50, "paciente/1/pnn50", self.procpnn50,"pnn50"))
+        t3 = threading.Thread(target=self.subscribe, args=(self.cpnn20, "paciente/1/pnn20", self.procpnn20,"pnn20"))
+        t4 = threading.Thread(target=self.subscribe, args=(self.crmssd, "paciente/1/rmssd", self.procrmssd,"rmssd"))
+        t1.start()
+        t2.start()
+        t3.start()
+        t4.start()
+    def subscribe(self,var,topic,callback,id):
+        var = Cliente("127.0.0.1", 1883, callback, topic=topic,id=id)
+    def prochr(self ,client, userdata, message):
+        self.hrresult.setText(message.payload.decode())
+    def procpnn20(self ,client, userdata, message):
+        self.pnn20result.setText(message.payload.decode())
+    def procpnn50(self ,client, userdata, message):
+        self.pnn50result.setText(message.payload.decode())
+    def procrmssd(self ,client, userdata, message):
+        self.rmssdresult.setText(message.payload.decode())
     def graficar(self):
         print('holi')
         mensaje = QtWidgets.QMessageBox()
@@ -70,7 +134,6 @@ class Ui_MainWindow(object):
          
     def update(self,valor):
         global curva,data
-        print("updateo: ",valor)
         try:
             data.append(float(valor))
 
@@ -78,7 +141,6 @@ class Ui_MainWindow(object):
             curva.setData(xdata)
             #QtGui.QApplication.instance().processEvents()
             if(len(data)>2048):
-                print("popeo")
                 data.pop(0)
                 #print(data)
         except Exception as e:
@@ -86,10 +148,7 @@ class Ui_MainWindow(object):
         
     def iniciar(self):
         global curva,data
-        print("Antes de inicializar el hilo")
         self.hilo1 = Hilo1(self.lineEditPuerto.text(),self.update,parent=self.MainWindow)
-        print("Despues de inicializar el hilo")
-        print('iniciar')
         data = [0 for i in range(2048)]
         self.lecturas=[]
         curva = self.graphicsView.getPlotItem().plot()
@@ -97,9 +156,7 @@ class Ui_MainWindow(object):
         '''timer = QtCore.QTimer(self.graphicsView)
         timer.timeout.connect(self.update)
         timer.start(10)'''
-        print("Antes")
         QtGui.QApplication.instance().allWidgets()
-        print("Despues")
         
         
         
@@ -110,11 +167,16 @@ class Hilo1(QtCore.QThread):
     
     def __init__(self,puerto,callback,parent=None):
         super(Hilo1,self).__init__(parent)
-        print("Entró al constructor del hilo")
         self.callback = callback
         self.puerto = serial.Serial(puerto,9600)
         #self.sigf.connect(callback)
         self.lecturas=[]
+
+    def publicar(self,arreglo):
+        print("publicando")
+        print(arreglo)
+        publish.single("paciente/1", arreglo, hostname="127.0.0.1")
+        print("publicado")
 
         
     def run(self):
@@ -122,18 +184,16 @@ class Hilo1(QtCore.QThread):
             try:
                 valor = self.puerto.readline()
                 valor = valor.decode().strip()
-                print("Antes del callback")
                 self.callback(valor)
                 self.lecturas.append(float(valor))
                 if (len(self.lecturas) == 512):
                     try:
-                        print(self.lecturas)
-                        publish.single("paciente/1", str(self.lecturas), hostname="127.0.0.1")
+                        t = threading.Thread(target=self.publicar, args=(str(self.lecturas),))
+                        t.start()
                         self.lecturas = []
                     except Exception as e:
                         print(e)
                         self.lecturas = []
-                print("Despues del callback")
                 #self.sigf.emit(valor)
             except Exception as e:
                 print(e)

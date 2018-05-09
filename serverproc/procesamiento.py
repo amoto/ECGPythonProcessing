@@ -1,4 +1,6 @@
 import math
+import paho.mqtt.publish as publish
+import threading
 class Procesador:
 
     def __init__(self,topico,datos):
@@ -18,7 +20,7 @@ class Procesador:
         self.filtrar()
         self.picos()
         self.hr()
-        self.var()
+
     def filtrar(self):
         self.datosFiltrados=[0 for i in range(self.n)]
         self.filtro2=[0 for i in range(self.n)]
@@ -59,19 +61,24 @@ class Procesador:
         self.posiciones=pos
     def hr(self):
         n=len(self.posiciones)
-        der = [0 for i in range(n-1)]
-        av = 0
-        max = -1
-        min = float('inf')
-        for i in range(1,n):
-            der[i - 1]=(self.posiciones[i]-self.posiciones[i-1]) * 60 / self.frec
-            av += der[i-1]
-            if (der[i-1] > max):
-                max=der[i-1]
-            if (der[i-1] < min):
-                min=der[i-1]
-        av=av/n
-        print("HR:",av)
+        if(n!=0):
+            der = [0 for i in range(n-1)]
+            av = 0
+            max = -1
+            min = float('inf')
+            for i in range(1,n):
+                der[i - 1]=(self.posiciones[i]-self.posiciones[i-1]) * 60 / self.frec
+                av += der[i-1]
+                if (der[i-1] > max):
+                    max=der[i-1]
+                if (der[i-1] < min):
+                    min=der[i-1]
+            print(n)
+            av=av/n
+            print("HR:",av)
+            t = threading.Thread(target=self.publicar, args=(str(av),"/hr",))
+            t.start()
+            self.var()
     def var(self):
         diff =[0 for i in range(len(self.posiciones)-1)]
         f = [0 for i in range(len(self.posiciones)-1)]
@@ -98,4 +105,13 @@ class Procesador:
         for i in range(n):
             std += math.pow(diff[i] - meandiff, 2)
         std = math.sqrt(std / (n - 1))
+        t = threading.Thread(target=self.publicar, args=(str(pnn50),"/pnn50",))
+        t.start()
+        t = threading.Thread(target=self.publicar, args=(str(pnn20),"/pnn20",))
+        t.start()
+        t = threading.Thread(target=self.publicar, args=(str(rmssd),"/rmssd",))
+        t.start()
+    def publicar(self,dato,topic):
+        print("publishing: ",dato," topic: ",self.topico+topic)
+        publish.single(self.topico+topic, dato, hostname="127.0.0.1")
 

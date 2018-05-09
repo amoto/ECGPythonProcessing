@@ -19,7 +19,7 @@
      <rect>
       <x>330</x>
       <y>20</y>
-      <width>371</width>
+      <width>411</width>
       <height>51</height>
      </rect>
     </property>
@@ -42,7 +42,7 @@
      <rect>
       <x>380</x>
       <y>120</y>
-      <width>241</width>
+      <width>291</width>
       <height>31</height>
      </rect>
     </property>
@@ -73,6 +73,142 @@
      </rect>
     </property>
    </widget>
+   <widget class="QLabel" name="hrlabel">
+    <property name="geometry">
+     <rect>
+      <x>795</x>
+      <y>40</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Ritmo cardíaco</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="hrresult">
+    <property name="geometry">
+     <rect>
+      <x>900</x>
+      <y>40</y>
+      <width>56</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 255);
+border-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="pnn50result">
+    <property name="geometry">
+     <rect>
+      <x>900</x>
+      <y>60</y>
+      <width>56</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 255);
+border-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="pnn50label">
+    <property name="geometry">
+     <rect>
+      <x>795</x>
+      <y>60</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>pnn50</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="pnn20result">
+    <property name="geometry">
+     <rect>
+      <x>900</x>
+      <y>80</y>
+      <width>56</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 255);
+border-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="pnn20label">
+    <property name="geometry">
+     <rect>
+      <x>795</x>
+      <y>80</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>pnn20</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="rmssdresult">
+    <property name="geometry">
+     <rect>
+      <x>900</x>
+      <y>100</y>
+      <width>56</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 255);
+border-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="rmssdlabel">
+    <property name="geometry">
+     <rect>
+      <x>795</x>
+      <y>100</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>rmssd</string>
+    </property>
+   </widget>
+   <widget class="QFrame" name="frame">
+    <property name="geometry">
+     <rect>
+      <x>780</x>
+      <y>30</y>
+      <width>191</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -80,7 +216,7 @@
      <x>0</x>
      <y>0</y>
      <width>1021</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>
