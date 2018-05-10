@@ -148,15 +148,20 @@ class Ui_MainWindow(object):
         
     def iniciar(self):
         global curva,data
-        self.hilo1 = Hilo1(self.lineEditPuerto.text(),self.update,parent=self.MainWindow)
-        data = [0 for i in range(2048)]
-        self.lecturas=[]
-        curva = self.graphicsView.getPlotItem().plot()
-        self.hilo1.start()
-        '''timer = QtCore.QTimer(self.graphicsView)
-        timer.timeout.connect(self.update)
-        timer.start(10)'''
-        QtGui.QApplication.instance().allWidgets()
+        about_box = QtWidgets.QMessageBox()
+        try:
+            self.hilo1 = Hilo1(self.lineEditPuerto.text(),self.update,parent=self.MainWindow)
+            data = [0 for i in range(2048)]
+            self.lecturas=[]
+            curva = self.graphicsView.getPlotItem().plot()
+            self.hilo1.start()
+            '''timer = QtCore.QTimer(self.graphicsView)
+            timer.timeout.connect(self.update)
+            timer.start(10)'''
+            QtGui.QApplication.instance().allWidgets()
+        except Exception as e:
+            about_box.about(about_box, 'El puerto especificado no funciona', 'No se puede conectar al puerto '+self.lineEditPuerto.text())
+        
         
         
         
